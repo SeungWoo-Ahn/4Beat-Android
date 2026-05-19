@@ -24,10 +24,6 @@ class HomeViewModel @Inject constructor(
     private val _sideEffect = Channel<HomeSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-    init {
-        loadMyGroups()
-    }
-
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.OnPlusIconClicked -> onPlusIconClicked()
