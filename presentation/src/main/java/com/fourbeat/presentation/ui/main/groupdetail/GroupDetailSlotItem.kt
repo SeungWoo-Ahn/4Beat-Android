@@ -5,17 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -26,9 +27,12 @@ import coil3.compose.AsyncImage
 import com.fourbeat.presentation.model.group.FeedPostUiModel
 import com.fourbeat.presentation.model.group.GroupFeedSlotUiModel
 import com.fourbeat.presentation.theme.Gray100
+import com.fourbeat.presentation.theme.Gray400
 import com.fourbeat.presentation.theme.White
 import com.fourbeat.presentation.theme.bold14
+import com.fourbeat.presentation.theme.corderRadius
 import com.fourbeat.presentation.theme.normal14
+import com.fourbeat.presentation.theme.normalSerif14
 import com.fourbeat.presentation.ui.component.VideoPlayer
 
 @Composable
@@ -42,7 +46,11 @@ fun GroupDetailSlotItem(
     val settledPost = slot.posts.getOrNull(pagerState.settledPage)
     val videoSource = settledPost?.videoSource
 
-    Box(modifier = modifier.clipToBounds()) {
+    Box(
+        modifier = modifier
+            .clipToBounds()
+            .clip(shape = RoundedCornerShape(size = 8.dp))
+    ) {
         // Layer 1: Background
         when {
             exoPlayer != null && videoSource != null -> VideoPlayer(
@@ -78,18 +86,20 @@ fun GroupDetailSlotItem(
         }
 
         // Layer 4: 멤버 정보(항상 고정) + 빈 슬롯 메시지
-        Box(modifier = Modifier.matchParentSize().padding(12.dp)) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .padding(16.dp)
+        ) {
             Column(
                 modifier = Modifier.align(Alignment.TopStart),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Text(text = slot.member.nickname, style = bold14, color = White)
-                    Text(text = slot.member.name, style = normal14, color = White.copy(alpha = 0.7f))
-                }
+                Text(
+                    text = slot.member.nickname,
+                    style = bold14,
+                    color = White
+                )
                 settledPost?.let {
                     Text(text = it.createdAt, style = normal14, color = White.copy(alpha = 0.7f))
                 }
@@ -112,28 +122,30 @@ private fun PostInfoOverlay(post: FeedPostUiModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp),
+            .padding(16.dp),
     ) {
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            post.comment?.let {
-                Text(
-                    text = it,
-                    style = normal14,
-                    color = White,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
-                )
-            } ?: Spacer(modifier = Modifier.weight(1f))
-
+            Box(modifier = Modifier.weight(1f)) {
+                post.comment?.let {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = Gray400.copy(alpha = 0.7f),
+                                shape = RoundedCornerShape(size = corderRadius)
+                            )
+                            .padding(all = 8.dp),
+                        text = it,
+                        style = normalSerif14,
+                        color = White,
+                    )
+                }
+            }
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(4.dp),

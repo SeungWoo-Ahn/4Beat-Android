@@ -9,6 +9,11 @@ import com.fourbeat.presentation.model.group.FeedPostUiModel
 import com.fourbeat.presentation.model.group.GroupFeedSlotUiModel
 import com.fourbeat.presentation.model.group.GroupFeedUiData
 import com.fourbeat.presentation.model.group.GroupUiModel
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+private val isoFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA)
+private val timeFormatter = SimpleDateFormat("HH:mm", Locale.KOREA)
 
 fun Group.toUiModel(): GroupUiModel =
     GroupUiModel(
@@ -48,5 +53,8 @@ fun FeedPost.toUiModel(): FeedPostUiModel =
         song = song,
         videoSource = videoSource,
         comment = comment,
-        createdAt = createdAt,
+        createdAt = runCatching {
+            val trimmed = createdAt.substringBefore('.')
+            timeFormatter.format(isoFormatter.parse(trimmed)!!)
+        }.getOrDefault(createdAt),
     )

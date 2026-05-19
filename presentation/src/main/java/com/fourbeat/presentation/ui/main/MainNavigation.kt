@@ -25,7 +25,7 @@ const val VIDEO_PATH_KEY = "videoFileUri"
 fun NavGraphBuilder.nestedMainGraph(appState: FourBeatAppState) {
     val navController = appState.naveController
 
-    navigation<ScreenGraph.Main>(startDestination = MainScreen.Home) {
+    navigation<ScreenGraph.Main>(startDestination = MainScreen.GroupDetail(9L)) {
         composable<MainScreen.Home> {
             HomeRoute(
                 navigateToCreateGroup = navController::navigateToCreateGroup,
