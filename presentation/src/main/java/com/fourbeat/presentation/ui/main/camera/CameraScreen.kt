@@ -11,6 +11,8 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.fourbeat.presentation.theme.contentPadding
 import timber.log.Timber
 
 @Composable
@@ -107,6 +110,8 @@ fun CameraRoute(
     )
 }
 
+private val RecordButtonSize = 72.dp
+
 @Composable
 private fun CameraScreen(
     uiState: CameraUiState,
@@ -116,11 +121,11 @@ private fun CameraScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color.Black),
     ) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
-            factory = { previewView }
+            factory = { previewView },
         )
         if (uiState.isRecording) {
             Text(
@@ -131,17 +136,11 @@ private fun CameraScreen(
                 fontWeight = FontWeight.Bold,
             )
         }
-        RecordButton(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(bottom = 48.dp),
-            isRecording = uiState.isRecording,
-            onClick = { onEvent(CameraEvent.OnRecordButtonClicked) },
-        )
+
         IconButton(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(bottom = 48.dp, end = 24.dp),
+                .padding(all = contentPadding),
             onClick = { onEvent(CameraEvent.OnCameraFlipClicked) },
             enabled = !uiState.isRecording,
         ) {
@@ -151,6 +150,14 @@ private fun CameraScreen(
                 tint = Color.White,
             )
         }
+
+        RecordButton(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(all = contentPadding),
+            isRecording = uiState.isRecording,
+            onClick = { onEvent(CameraEvent.OnRecordButtonClicked) },
+        )
     }
 }
 
@@ -160,17 +167,26 @@ private fun RecordButton(
     isRecording: Boolean,
     onClick: () -> Unit,
 ) {
-    IconButton(
-        modifier = modifier.size(72.dp),
-        onClick = onClick,
+    Box(
+        modifier = modifier
+            .size(RecordButtonSize)
+            .clickable(onClick = onClick)
+            .border(width = 4.dp, color = Color.White, shape = CircleShape)
+            .padding(8.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Color.Red,
-                    shape = if (isRecording) RoundedCornerShape(8.dp) else CircleShape,
-                ),
-        )
+        if (isRecording) {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .background(color = Color.Red, shape = RoundedCornerShape(6.dp)),
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Red, shape = CircleShape),
+            )
+        }
     }
 }
