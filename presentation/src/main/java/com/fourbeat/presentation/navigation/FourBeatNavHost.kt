@@ -15,7 +15,7 @@ fun FourBeatNavHost(
     NavHost(
         modifier = modifier,
         navController = appState.naveController,
-        startDestination = ScreenGraph.Main
+        startDestination = ScreenGraph.Auth
     ) {
         nestedAuthGraph(appState = appState)
         nestedMainGraph(appState = appState)
