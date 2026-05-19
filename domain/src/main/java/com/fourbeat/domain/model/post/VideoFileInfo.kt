@@ -4,5 +4,4 @@ import java.io.File
 
 data class VideoFileInfo(
     val file: File,
-    val mimeType: String,
 )

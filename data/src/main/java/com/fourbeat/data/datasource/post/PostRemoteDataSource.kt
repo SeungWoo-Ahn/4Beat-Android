@@ -30,10 +30,10 @@ class PostRemoteDataSource @Inject constructor(
                 setBody(body)
             }.body()
 
-    override suspend fun uploadVideoFile(uploadUrl: String, file: File, mimeType: String) {
+    override suspend fun uploadVideoFile(uploadUrl: String, file: File) {
         externalClient.put(uploadUrl) {
             setBody(object : OutgoingContent.ReadChannelContent() {
-                override val contentType = ContentType.parse(mimeType)
+                override val contentType = ContentType.Video.MP4
                 override val contentLength = file.length()
                 override fun readFrom(): ByteReadChannel = file.inputStream().toByteReadChannel()
             })

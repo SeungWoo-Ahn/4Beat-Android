@@ -8,9 +8,9 @@ import javax.inject.Inject
 class UploadVideoFileUseCase @Inject constructor(
     private val postRepository: PostRepository,
 ) {
-    suspend operator fun invoke(uploadUrl: String, file: File, mimeType: String): Result<Unit> =
+    suspend operator fun invoke(uploadUrl: String, file: File): Result<Unit> =
         runCatching {
-            postRepository.uploadVideoFile(uploadUrl, file, mimeType)
+            postRepository.uploadVideoFile(uploadUrl, file)
         }.recoverCatching {
             throw PostException.VideoUploadFailed(it)
         }

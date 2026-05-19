@@ -16,7 +16,6 @@ interface GroupRepository {
     suspend fun getGroupInfo(groupId: Long): Group
     suspend fun getGroupPostStatus(groupId: Long): MyPostStatus
     suspend fun createPost(groupId: Long, request: CreatePostRequest): Post
-    suspend fun getGroupFeed(groupId: Long, date: String): GroupFeed
     fun observeGroupFeed(groupId: Long, date: String): Flow<GroupFeed>
     suspend fun refreshGroupFeed(groupId: Long, date: String): GroupFeed
     suspend fun insertOptimisticPost(

@@ -8,13 +8,9 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.fourbeat.data.database.entity.PostEntity
 import com.fourbeat.data.database.entity.PostStatus
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM posts WHERE groupId = :groupId AND date = :date ORDER BY slotOrder ASC, createdAt ASC")
-    fun observeByGroupAndDate(groupId: Long, date: String): Flow<List<PostEntity>>
-
     @Upsert
     suspend fun upsertAll(posts: List<PostEntity>)
 
@@ -29,9 +25,6 @@ interface PostDao {
         deleteStableByGroupAndDate(groupId, date)
         upsertAll(posts)
     }
-
-    @Query("SELECT slotOrder FROM posts WHERE groupId = :groupId AND date = :date AND memberId = :memberId LIMIT 1")
-    suspend fun getSlotOrderByMember(groupId: Long, date: String, memberId: Long): Int?
 
     @Query("UPDATE posts SET status = :status WHERE id = :id")
     suspend fun updateStatus(id: Long, status: PostStatus)

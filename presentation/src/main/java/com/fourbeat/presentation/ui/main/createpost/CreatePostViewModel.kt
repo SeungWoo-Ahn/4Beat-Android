@@ -67,7 +67,7 @@ class CreatePostViewModel @Inject constructor(
                 }
             }
             is CreatePostEvent.OnVideoFileSelected -> uiState = uiState.copy(
-                videoFileInfo = VideoFileInfo(file = event.file, mimeType = event.mimeType)
+                videoFileInfo = VideoFileInfo(file = event.file)
             )
             CreatePostEvent.OnVideoDeleted -> {
                 val file = uiState.videoFileInfo?.file

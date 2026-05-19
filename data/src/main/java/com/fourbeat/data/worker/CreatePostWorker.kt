@@ -38,33 +38,36 @@ class CreatePostWorker @AssistedInject constructor(
         val tempId = inputData.getLong(KEY_TEMP_ID, 0L)
             .takeIf { it != 0L } ?: return Result.failure()
 
+        val groupId = inputData.getLong(KEY_GROUP_ID, -1L)
+        val songTitle = inputData.getString(KEY_SONG_TITLE)
+            ?: run { rollbackPostUseCase(tempId); return Result.failure() }
+        val songArtist = inputData.getString(KEY_SONG_ARTIST)
+            ?: run { rollbackPostUseCase(tempId); return Result.failure() }
+        val songImageUrl = inputData.getString(KEY_SONG_IMAGE_URL)
+        val comment = inputData.getString(KEY_COMMENT)
+        val filePath = inputData.getString(KEY_FILE_PATH)
+
+        val videoFileInfo = filePath?.let {
+            val file = File(it)
+            if (!file.exists()) {
+                rollbackPostUseCase(tempId)
+                return Result.failure()
+            }
+            VideoFileInfo(file = file)
+        }
+
         if (runAttemptCount >= MAX_RETRY_COUNT) {
             rollbackPostUseCase(tempId)
             return Result.failure()
         }
 
-        val groupId = inputData.getLong(KEY_GROUP_ID, -1L)
-        val songTitle = inputData.getString(KEY_SONG_TITLE) ?: run { rollbackPostUseCase(tempId); return Result.failure() }
-        val songArtist = inputData.getString(KEY_SONG_ARTIST) ?: run { rollbackPostUseCase(tempId); return Result.failure() }
-        val songImageUrl = inputData.getString(KEY_SONG_IMAGE_URL)
-        val comment = inputData.getString(KEY_COMMENT)
-        val filePath = inputData.getString(KEY_FILE_PATH)
-        val mimeType = inputData.getString(KEY_MIME_TYPE)
-
-        val videoFileInfo = when {
-            filePath != null && mimeType != null ->
-                VideoFileInfo(file = File(filePath), mimeType = mimeType)
-            else -> null
-        }
-
-        val videoUrl = videoFileInfo?.let { (file, mime) ->
-            getFileUploadUrlUseCase(request = FileUploadUrlRequest(file.name, mime))
+        val videoUrl = videoFileInfo?.let { (file) ->
+            getFileUploadUrlUseCase(request = FileUploadUrlRequest(file.name))
                 .getOrElse { return Result.retry() }
                 .also {
                     uploadVideoFileUseCase(
                         uploadUrl = it.uploadUrl,
                         file = file,
-                        mimeType = mime
                     ).getOrElse { return Result.retry() }
                 }
                 .videoUrl
@@ -96,7 +99,6 @@ class CreatePostWorker @AssistedInject constructor(
         const val KEY_SONG_IMAGE_URL = "key_song_image_url"
         const val KEY_COMMENT = "key_comment"
         const val KEY_FILE_PATH = "key_file_path"
-        const val KEY_MIME_TYPE = "key_mime_type"
         const val KEY_TEMP_ID = "key_temp_id"
     }
 }

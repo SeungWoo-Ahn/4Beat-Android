@@ -22,7 +22,10 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.exoplayer.ExoPlayer
 import com.fourbeat.presentation.model.group.GroupFeedUiData
+import com.fourbeat.presentation.ui.component.ErrorComponent
+import com.fourbeat.presentation.ui.component.rememberExoPlayerPool
 import com.fourbeat.presentation.ui.main.groupdetail.header.GroupDetailHeader
 
 @Composable
@@ -56,11 +59,19 @@ private fun GroupDetailScreen(
             navigateToSelectSong = navigateToSelectSong,
             showGroupCodeDialog = showGroupCodeDialog,
         )
-        GroupDetailFeed(
-            modifier = Modifier.weight(1f),
-            uiState = uiState,
-            onEvent = onEvent,
-        )
+        Box(modifier = Modifier.weight(1f)) {
+            GroupDetailFeed(
+                modifier = Modifier.fillMaxSize(),
+                uiState = uiState,
+                onEvent = onEvent,
+            )
+            if (uiState.isError) {
+                ErrorComponent(
+                    modifier = Modifier.fillMaxSize(),
+                    onRefresh = { onEvent(GroupDetailEvent.OnRetry) },
+                )
+            }
+        }
     }
 }
 
@@ -70,16 +81,15 @@ private fun GroupDetailFeed(
     uiState: GroupDetailUiState,
     onEvent: (GroupDetailEvent) -> Unit,
 ) {
+    // ExoPlayer 3개 — 화면 전체에서 공유, 슬롯 위치(0/1/2)에 고정 할당
+    val exoPlayers = rememberExoPlayerPool()
+
     val pagerState = rememberPagerState(initialPage = 1) { 3 }
 
-    // Reset to center when current changes after a shift
     LaunchedEffect(uiState.currentFeed?.date) {
-        if (pagerState.currentPage != 1) {
-            pagerState.scrollToPage(1)
-        }
+        if (pagerState.currentPage != 1) pagerState.scrollToPage(1)
     }
 
-    // page 2 = prev (scroll UP), page 0 = next (scroll DOWN)
     LaunchedEffect(pagerState.settledPage) {
         when (pagerState.settledPage) {
             2 -> onEvent(GroupDetailEvent.OnScrollToPrev)
@@ -94,8 +104,8 @@ private fun GroupDetailFeed(
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset =
                 when {
-                    available.y < 0 && previousFeed == null -> available  // UP blocked: no prev
-                    available.y > 0 && nextFeed == null -> available      // DOWN blocked: no next
+                    available.y < 0 && previousFeed == null -> available
+                    available.y > 0 && nextFeed == null -> available
                     else -> Offset.Zero
                 }
         }
@@ -106,9 +116,6 @@ private fun GroupDetailFeed(
         modifier = modifier.nestedScroll(nestedScrollConnection),
         userScrollEnabled = !uiState.isLoading,
     ) { page ->
-        // page 0 = next (bottom, scroll DOWN reveals)
-        // page 1 = current
-        // page 2 = prev (top, scroll UP reveals)
         val feed = when (page) {
             0 -> uiState.nextFeed
             1 -> uiState.currentFeed
@@ -116,7 +123,11 @@ private fun GroupDetailFeed(
             else -> null
         }
         if (feed != null) {
-            GroupDetailDatePage(feed = feed, isActive = page == 1)
+            GroupDetailDatePage(
+                feed = feed,
+                isActive = page == 1,
+                exoPlayers = exoPlayers,
+            )
         } else {
             Box(modifier = Modifier.fillMaxSize())
         }
@@ -128,6 +139,7 @@ private fun GroupDetailDatePage(
     modifier: Modifier = Modifier,
     feed: GroupFeedUiData,
     isActive: Boolean,
+    exoPlayers: List<ExoPlayer>,
 ) {
     val slotGroups = remember(feed.slots) { feed.slots.chunked(3) }
 
@@ -144,14 +156,14 @@ private fun GroupDetailDatePage(
                 val group = slotGroups.getOrNull(page) ?: return@HorizontalPager
                 val isGroupActive = isActive && page == pagerState.settledPage
                 Column(modifier = Modifier.fillMaxSize()) {
-                    group.forEach { slot ->
+                    group.forEachIndexed { index, slot ->
                         GroupDetailSlotItem(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(slotHeight),
                             slot = slot,
-                            slotHeight = slotHeight,
                             isActive = isGroupActive,
+                            exoPlayer = exoPlayers.getOrNull(index),
                         )
                     }
                 }

@@ -21,7 +21,7 @@ sealed interface CreatePostEvent {
     data object OnBackClicked : CreatePostEvent
     data object OnVideoShotClicked : CreatePostEvent
     data class OnCameraPermissionResult(val granted: Boolean) : CreatePostEvent
-    data class OnVideoFileSelected(val file: java.io.File, val mimeType: String) : CreatePostEvent
+    data class OnVideoFileSelected(val file: java.io.File) : CreatePostEvent
     data object OnVideoDeleted : CreatePostEvent
     data class OnCommentChanged(val comment: String) : CreatePostEvent
     data object OnUploadClicked : CreatePostEvent

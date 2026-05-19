@@ -1,5 +1,8 @@
 package com.fourbeat.presentation.ui.component
 
+import android.graphics.Matrix
+import android.view.TextureView
+import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -10,13 +13,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
-import com.fourbeat.presentation.model.post.VideoSource
+import com.fourbeat.domain.model.post.VideoSource
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -31,20 +34,39 @@ interface VideoCacheEntryPoint {
 
 @OptIn(UnstableApi::class)
 @Composable
-fun VideoPlayer(
-    modifier: Modifier = Modifier,
-    source: VideoSource,
-    isActive: Boolean = true,
-) {
-    val context = LocalContext.current
+fun rememberExoPlayer(): ExoPlayer = rememberExoPlayerPool(size = 1).first()
 
+@OptIn(UnstableApi::class)
+@Composable
+fun rememberExoPlayerPool(size: Int = 3): List<ExoPlayer> {
+    val context = LocalContext.current
     val dataSourceFactory = remember {
         EntryPointAccessors.fromApplication(
             context.applicationContext,
             VideoCacheEntryPoint::class.java,
         ).dataSourceFactory()
     }
+    val players = remember {
+        List(size) {
+            ExoPlayer.Builder(context)
+                .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
+                .build()
+                .apply { repeatMode = ExoPlayer.REPEAT_MODE_ONE }
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose { players.forEach { it.release() } }
+    }
+    return players
+}
 
+@Composable
+fun VideoPlayer(
+    modifier: Modifier = Modifier,
+    exoPlayer: ExoPlayer,
+    source: VideoSource,
+    isActive: Boolean = true,
+) {
     val uri = remember(source) {
         when (source) {
             is VideoSource.Local -> source.file.toUri()
@@ -52,43 +74,71 @@ fun VideoPlayer(
         }
     }
 
-    val exoPlayer = remember(uri) {
-        ExoPlayer.Builder(context)
-            .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
-            .build()
-            .apply {
-                setMediaItem(MediaItem.fromUri(uri))
-                repeatMode = ExoPlayer.REPEAT_MODE_ONE
-                prepare()
-            }
+    LaunchedEffect(uri, exoPlayer) {
+        exoPlayer.setMediaItem(MediaItem.fromUri(uri))
+        exoPlayer.prepare()
     }
 
     LaunchedEffect(isActive, exoPlayer) {
         if (isActive) exoPlayer.play() else exoPlayer.pause()
     }
 
+    val viewHolder = remember { TextureViewHolder() }
+
     DisposableEffect(exoPlayer) {
-        onDispose { exoPlayer.release() }
+        val listener = object : Player.Listener {
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                viewHolder.view?.let { applyCenterCrop(it, videoSize) }
+            }
+        }
+        exoPlayer.addListener(listener)
+        onDispose { exoPlayer.removeListener(listener) }
     }
 
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
-            PlayerView(ctx).apply {
-                useController = false
-                controllerAutoShow = false
-                setShowBuffering(PlayerView.SHOW_BUFFERING_NEVER)
-                setKeepContentOnPlayerReset(true)
-                setShutterBackgroundColor(android.graphics.Color.TRANSPARENT)
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            TextureView(ctx).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
+                viewHolder.view = this
+                addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+                    applyCenterCrop(v as TextureView, exoPlayer.videoSize)
+                }
             }
         },
         update = { view ->
-            if (view.player != exoPlayer) {
-                view.player = exoPlayer
-            }
-            view.useController = false
-            view.hideController()
+            exoPlayer.setVideoTextureView(view)
+            applyCenterCrop(view, exoPlayer.videoSize)
         },
     )
+}
+
+private class TextureViewHolder {
+    var view: TextureView? = null
+}
+
+private fun applyCenterCrop(view: TextureView, videoSize: VideoSize) {
+    val viewWidth = view.width.toFloat()
+    val viewHeight = view.height.toFloat()
+    val videoWidth = videoSize.width.toFloat()
+    val videoHeight = videoSize.height.toFloat()
+    if (viewWidth <= 0f || viewHeight <= 0f || videoWidth <= 0f || videoHeight <= 0f) return
+
+    val viewRatio = viewWidth / viewHeight
+    val videoRatio = videoWidth / videoHeight
+    val scaleX: Float
+    val scaleY: Float
+    if (videoRatio > viewRatio) {
+        scaleX = videoRatio / viewRatio
+        scaleY = 1f
+    } else {
+        scaleX = 1f
+        scaleY = viewRatio / videoRatio
+    }
+    val matrix = Matrix()
+    matrix.setScale(scaleX, scaleY, viewWidth / 2f, viewHeight / 2f)
+    view.setTransform(matrix)
 }

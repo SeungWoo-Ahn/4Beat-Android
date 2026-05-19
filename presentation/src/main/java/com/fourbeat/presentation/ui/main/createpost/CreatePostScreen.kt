@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import com.fourbeat.domain.model.post.Song
-import com.fourbeat.presentation.model.post.VideoSource
+import com.fourbeat.domain.model.post.VideoSource
 import com.fourbeat.presentation.theme.Gray100
 import com.fourbeat.presentation.theme.Gray500
 import com.fourbeat.presentation.theme.PrimaryColor
@@ -51,9 +51,9 @@ import com.fourbeat.presentation.ui.component.FourBeatTextArea
 import com.fourbeat.presentation.ui.component.NetworkImage
 import com.fourbeat.presentation.ui.component.TitleTopBar
 import com.fourbeat.presentation.ui.component.VideoPlayer
+import com.fourbeat.presentation.ui.component.rememberExoPlayer
 import com.fourbeat.presentation.ui.main.VIDEO_PATH_KEY
 import com.fourbeat.presentation.ui.util.noRippleClickable
-import android.webkit.MimeTypeMap
 import java.io.File
 
 @Composable
@@ -90,9 +90,7 @@ fun CreatePostRoute(
             ?.get<String>(VIDEO_PATH_KEY)
             ?.let { path ->
                 val file = File(path)
-                val mimeType = MimeTypeMap.getSingleton()
-                    .getMimeTypeFromExtension(file.extension) ?: "video/mp4"
-                viewModel.onEvent(CreatePostEvent.OnVideoFileSelected(file, mimeType))
+                viewModel.onEvent(CreatePostEvent.OnVideoFileSelected(file))
                 backStackEntry.savedStateHandle.remove<String>(VIDEO_PATH_KEY)
             }
     }
@@ -270,7 +268,8 @@ private fun VideoPreview(
     ) {
         VideoPlayer(
             modifier = Modifier.fillMaxSize(),
-            source = VideoSource.Local(videoFile)
+            exoPlayer = rememberExoPlayer(),
+            source = VideoSource.Local(videoFile),
         )
         IconButton(
             modifier = Modifier.align(Alignment.TopEnd),

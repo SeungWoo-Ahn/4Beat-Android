@@ -6,5 +6,5 @@ import java.io.File
 
 interface PostRepository {
     suspend fun getFileUploadUrl(request: FileUploadUrlRequest): FileUploadUrl
-    suspend fun uploadVideoFile(uploadUrl: String, file: File, mimeType: String)
+    suspend fun uploadVideoFile(uploadUrl: String, file: File)
 }

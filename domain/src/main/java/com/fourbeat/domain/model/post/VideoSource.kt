@@ -1,4 +1,4 @@
-package com.fourbeat.presentation.model.post
+package com.fourbeat.domain.model.post
 
 import java.io.File
 

@@ -17,6 +17,6 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun getFileUploadUrl(request: FileUploadUrlRequest): FileUploadUrl =
         postDataSource.getFileUploadUrl(request.asBody()).toDomain()
 
-    override suspend fun uploadVideoFile(uploadUrl: String, file: File, mimeType: String) =
-        postDataSource.uploadVideoFile(uploadUrl, file, mimeType)
+    override suspend fun uploadVideoFile(uploadUrl: String, file: File) =
+        postDataSource.uploadVideoFile(uploadUrl, file)
 }

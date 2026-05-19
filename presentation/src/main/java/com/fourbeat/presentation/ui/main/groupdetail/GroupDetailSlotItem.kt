@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -21,15 +20,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
-import com.fourbeat.domain.model.user.User
 import com.fourbeat.presentation.model.group.FeedPostUiModel
 import com.fourbeat.presentation.model.group.GroupFeedSlotUiModel
-import com.fourbeat.presentation.model.post.VideoSource
 import com.fourbeat.presentation.theme.Gray100
-import com.fourbeat.presentation.theme.Gray500
 import com.fourbeat.presentation.theme.White
 import com.fourbeat.presentation.theme.bold14
 import com.fourbeat.presentation.theme.normal14
@@ -39,63 +35,50 @@ import com.fourbeat.presentation.ui.component.VideoPlayer
 fun GroupDetailSlotItem(
     modifier: Modifier = Modifier,
     slot: GroupFeedSlotUiModel,
-    slotHeight: Dp,
     isActive: Boolean,
+    exoPlayer: ExoPlayer?,
 ) {
-    if (slot.posts.isEmpty()) {
-        SlotEmptyContent(modifier = modifier, member = slot.member)
-    } else {
-        val pagerState = rememberPagerState { slot.posts.size }
-        HorizontalPager(
-            state = pagerState,
-            modifier = modifier,
-        ) { page ->
-            SlotPostItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(slotHeight),
-                post = slot.posts[page],
-                member = slot.member,
-                isActive = isActive && page == pagerState.settledPage,
-            )
-        }
-    }
-}
+    val pagerState = rememberPagerState { slot.posts.size }
+    val settledPost = slot.posts.getOrNull(pagerState.settledPage)
+    val videoSource = settledPost?.videoSource
 
-@Composable
-private fun SlotPostItem(
-    modifier: Modifier = Modifier,
-    post: FeedPostUiModel,
-    member: User,
-    isActive: Boolean,
-) {
     Box(modifier = modifier.clipToBounds()) {
-        if (post.videoUrl != null) {
-            VideoPlayer(
+        // Layer 1: Background
+        when {
+            exoPlayer != null && videoSource != null -> VideoPlayer(
                 modifier = Modifier.fillMaxSize(),
-                source = VideoSource.Remote(post.videoUrl),
+                exoPlayer = exoPlayer,
+                source = videoSource,
                 isActive = isActive,
             )
-        } else {
-            AsyncImage(
+            settledPost != null -> AsyncImage(
                 modifier = Modifier.fillMaxSize(),
-                model = post.song.albumImageUrl,
+                model = settledPost.song.albumImageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
+            else -> Box(modifier = Modifier.fillMaxSize().background(Gray100))
         }
 
+        // Layer 2: Dim overlay (강도는 영상/이미지/빈 슬롯 여부에 따라 조정)
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(Color.Black.copy(alpha = 0.1f))
+                .background(Color.Black.copy(alpha = if (videoSource != null) 0.15f else 0.3f))
         )
 
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .padding(12.dp)
-        ) {
+        // Layer 3: HorizontalPager — 복수 게시글 간 좌우 스와이프 + 하단 게시글 정보
+        if (slot.posts.isNotEmpty()) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+            ) { page ->
+                PostInfoOverlay(post = slot.posts[page])
+            }
+        }
+
+        // Layer 4: 멤버 정보(항상 고정) + 빈 슬롯 메시지
+        Box(modifier = Modifier.matchParentSize().padding(12.dp)) {
             Column(
                 modifier = Modifier.align(Alignment.TopStart),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -104,92 +87,78 @@ private fun SlotPostItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    Text(text = member.nickname, style = bold14, color = White)
-                    Text(text = member.name, style = normal14, color = White.copy(alpha = 0.7f))
+                    Text(text = slot.member.nickname, style = bold14, color = White)
+                    Text(text = slot.member.name, style = normal14, color = White.copy(alpha = 0.7f))
                 }
+                settledPost?.let {
+                    Text(text = it.createdAt, style = normal14, color = White.copy(alpha = 0.7f))
+                }
+            }
+
+            if (slot.posts.isEmpty()) {
                 Text(
-                    text = post.createdAt,
+                    text = "아직 게시글이 없어요",
+                    modifier = Modifier.align(Alignment.Center),
                     style = normal14,
                     color = White.copy(alpha = 0.7f),
                 )
-            }
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                post.comment?.let {
-                    Text(
-                        text = it,
-                        style = normal14,
-                        color = White,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp),
-                    )
-                } ?: Spacer(modifier = Modifier.weight(1f))
-
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    AsyncImage(
-                        model = post.song.albumImageUrl,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(56.dp),
-                        contentScale = ContentScale.Crop,
-                    )
-                    Text(
-                        text = post.song.title,
-                        style = bold14,
-                        color = White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = post.song.artist,
-                        style = normal14,
-                        color = White.copy(alpha = 0.7f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
             }
         }
     }
 }
 
 @Composable
-private fun SlotEmptyContent(
-    modifier: Modifier = Modifier,
-    member: User,
-) {
+private fun PostInfoOverlay(post: FeedPostUiModel) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(Gray100),
+            .padding(12.dp),
     ) {
         Row(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = member.nickname, style = bold14)
-            Text(text = member.name, style = normal14, color = Gray500)
+            post.comment?.let {
+                Text(
+                    text = it,
+                    style = normal14,
+                    color = White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                )
+            } ?: Spacer(modifier = Modifier.weight(1f))
+
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                AsyncImage(
+                    model = post.song.albumImageUrl,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp),
+                    contentScale = ContentScale.Crop,
+                )
+                Text(
+                    text = post.song.title,
+                    style = bold14,
+                    color = White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = post.song.artist,
+                    style = normal14,
+                    color = White.copy(alpha = 0.7f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
-        Text(
-            text = "아직 게시글이 없어요",
-            modifier = Modifier.align(Alignment.Center),
-            style = normal14,
-            color = Gray500,
-        )
     }
 }

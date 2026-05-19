@@ -14,6 +14,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.parameters
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,15 +25,18 @@ class SpotifyRemoteDataSource @Inject constructor(
     private val client: HttpClient,
 ) : SpotifyDataSource {
 
+    private val tokenMutex = Mutex()
     private var accessToken: String? = null
     private var tokenExpiresAt: Long = 0L
 
-    private suspend fun getValidAccessToken(): String {
-        if (accessToken != null && System.currentTimeMillis() < tokenExpiresAt) {
-            return accessToken!!
+    private suspend fun getValidAccessToken(): String =
+        tokenMutex.withLock {
+            if (accessToken != null && System.currentTimeMillis() < tokenExpiresAt) {
+                accessToken!!
+            } else {
+                fetchAndCacheToken()
+            }
         }
-        return fetchAndCacheToken()
-    }
 
     private suspend fun fetchAndCacheToken(): String {
         val response = client.submitForm(

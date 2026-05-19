@@ -7,7 +7,6 @@ import com.fourbeat.data.worker.CreatePostWorker
 import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_COMMENT
 import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_FILE_PATH
 import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_GROUP_ID
-import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_MIME_TYPE
 import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_SONG_ARTIST
 import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_SONG_IMAGE_URL
 import com.fourbeat.data.worker.CreatePostWorker.Companion.KEY_SONG_TITLE
@@ -45,7 +44,6 @@ class WorkRepositoryImpl @Inject constructor(
             KEY_SONG_IMAGE_URL to request.song.albumImageUrl,
             KEY_COMMENT to request.comment,
             KEY_FILE_PATH to videoFileInfo?.file?.absolutePath,
-            KEY_MIME_TYPE to videoFileInfo?.mimeType,
         )
 
         val constraints = Constraints.Builder()

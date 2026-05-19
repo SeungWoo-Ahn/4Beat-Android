@@ -46,7 +46,7 @@ fun FeedPost.toUiModel(): FeedPostUiModel =
     FeedPostUiModel(
         id = id,
         song = song,
-        videoUrl = videoUrl,
+        videoSource = videoSource,
         comment = comment,
         createdAt = createdAt,
     )
