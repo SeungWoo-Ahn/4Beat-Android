@@ -1,5 +1,6 @@
 package com.fourbeat.data.database.entity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -16,17 +17,10 @@ data class PostEntity(
     val groupId: Long,
     val date: String,
     val memberId: Long,
-    val memberName: String,
-    val memberNickname: String,
-    val slotOrder: Int,
-    val songTitle: String,
-    val songArtist: String,
-    val albumImageUrl: String?,
+    @Embedded val song: SongInfo,
     val filePath: String?,
     val videoUrl: String?,
     val comment: String?,
     val createdAt: String = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA).format(Date()),
     val status: PostStatus,
-    val nextDate: String?,
-    val previousDate: String?,
 )

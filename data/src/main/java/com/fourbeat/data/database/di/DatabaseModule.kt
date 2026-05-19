@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.fourbeat.data.database.FourBeatDatabase
 import com.fourbeat.data.database.dao.PostDao
+import com.fourbeat.data.database.dao.SlotDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,8 +24,12 @@ object DatabaseModule {
             FourBeatDatabase::class.java,
             "four-beat.db"
         )
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 
     @Provides
     fun providePostDao(db: FourBeatDatabase): PostDao = db.postDao()
+
+    @Provides
+    fun provideSlotDao(db: FourBeatDatabase): SlotDao = db.slotDao()
 }

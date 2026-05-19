@@ -2,6 +2,7 @@ package com.fourbeat.data.mapper
 
 import com.fourbeat.data.database.entity.PostEntity
 import com.fourbeat.data.database.entity.PostStatus
+import com.fourbeat.data.database.entity.SongInfo
 import com.fourbeat.data.network.dto.post.CreatePostRequestBody
 import com.fourbeat.data.network.dto.post.FileUploadUrlRequestBody
 import com.fourbeat.data.network.dto.post.FileUploadUrlResponse
@@ -51,27 +52,23 @@ fun CreatePostRequest.toEntity(
     tempId: Long,
     groupId: Long,
     today: String,
-    slotOrder: Int,
     member: User,
     filePath: String?,
 ): PostEntity = PostEntity(
-        id = tempId,
-        groupId = groupId,
-        date = today,
-        memberId = member.id,
-        memberName = member.name,
-        memberNickname = member.nickname,
-        slotOrder = slotOrder,
-        songTitle = song.title,
-        songArtist = song.artist,
+    id = tempId,
+    groupId = groupId,
+    date = today,
+    memberId = member.id,
+    song = SongInfo(
+        title = song.title,
+        artist = song.artist,
         albumImageUrl = song.albumImageUrl,
-        filePath = filePath,
-        videoUrl = null,
-        comment = comment,
-        status = PostStatus.PENDING,
-        nextDate = null,
-        previousDate = null,
-   )
+    ),
+    filePath = filePath,
+    videoUrl = null,
+    comment = comment,
+    status = PostStatus.PENDING,
+)
 
 fun FileUploadUrlResponse.toDomain(): FileUploadUrl =
     FileUploadUrl(
@@ -88,7 +85,7 @@ fun FileUploadUrlRequest.asBody(): FileUploadUrlRequestBody =
 fun PostEntity.toDomain(videoSource: VideoSource?): FeedPost =
     FeedPost(
         id = id,
-        song = Song(title = songTitle, artist = songArtist, albumImageUrl = albumImageUrl),
+        song = Song(title = song.title, artist = song.artist, albumImageUrl = song.albumImageUrl),
         videoSource = videoSource,
         comment = comment,
         createdAt = createdAt,
