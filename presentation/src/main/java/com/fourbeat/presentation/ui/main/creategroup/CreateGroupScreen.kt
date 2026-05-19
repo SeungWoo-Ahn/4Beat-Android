@@ -16,7 +16,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fourbeat.domain.model.group.GroupMemberCount
 import com.fourbeat.presentation.theme.contentPadding
-import com.fourbeat.presentation.theme.normal32
+import com.fourbeat.presentation.theme.medium32
 import com.fourbeat.presentation.ui.component.FourBeatButton
 import com.fourbeat.presentation.ui.component.FourBeatLabel
 import com.fourbeat.presentation.ui.component.FourBeatSpacer
@@ -68,7 +68,7 @@ private fun CreateGroupScreen(
         ) {
             Text(
                 text = "어떤 방으로 부를까?",
-                style = normal32,
+                style = medium32,
             )
             FourBeatTextField(
                 value = uiState.name,

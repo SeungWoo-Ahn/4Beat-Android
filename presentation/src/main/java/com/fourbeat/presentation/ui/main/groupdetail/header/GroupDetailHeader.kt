@@ -20,7 +20,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fourbeat.presentation.theme.Gray500
 import com.fourbeat.presentation.theme.contentPadding
 import com.fourbeat.presentation.theme.normal14
-import com.fourbeat.presentation.theme.normal32
+import com.fourbeat.presentation.theme.medium32
 import com.fourbeat.presentation.ui.component.FourBeatSpacer
 
 @Composable
@@ -57,7 +57,7 @@ fun GroupDetailHeader(
             FourBeatSpacer(size = 8)
             Text(
                 text = group.name,
-                style = normal32,
+                style = medium32,
             )
         }
         Row(

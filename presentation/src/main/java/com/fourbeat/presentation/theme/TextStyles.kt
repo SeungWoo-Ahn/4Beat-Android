@@ -44,12 +44,12 @@ val medium56 = TextStyle(
     fontSize = 56.sp,
     fontWeight = FontWeight.Medium,
 )
-
-val normal32 = TextStyle(
+val medium32 = TextStyle(
     fontFamily = NotoSerifKr,
     fontSize = 32.sp,
-    fontWeight = FontWeight.Normal,
+    fontWeight = FontWeight.Medium,
 )
+
 val normal20 = TextStyle(
     fontFamily = NotoSerifKr,
     fontSize = 20.sp,
