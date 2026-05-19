@@ -1,6 +1,6 @@
 package com.fourbeat.presentation.ui.main.home
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.fourbeat.presentation.theme.Gray200
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import com.fourbeat.presentation.theme.Gray100
 import com.fourbeat.presentation.theme.Gray500
 import com.fourbeat.presentation.theme.bold18
 import com.fourbeat.presentation.theme.contentPadding
 import com.fourbeat.presentation.theme.corderRadius
 import com.fourbeat.presentation.theme.normal14
+import com.fourbeat.presentation.theme.normal16
 import com.fourbeat.presentation.ui.component.ErrorComponent
 import com.fourbeat.presentation.ui.component.HomeTopBar
 import com.fourbeat.presentation.ui.component.LoadingComponent
@@ -45,6 +48,10 @@ fun HomeRoute(
                 is HomeSideEffect.NavigateToGroupDetail -> navigateToGroupDetail(effect.groupId)
             }
         }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onEvent(HomeEvent.OnRefresh)
     }
 
     HomeScreen(
@@ -73,8 +80,18 @@ private fun HomeScreen(
             is HomeUiState.Success -> Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(all = contentPadding)
+                    .padding(
+                        start = contentPadding,
+                        end = contentPadding,
+                        bottom = contentPadding
+                    ),
+                verticalArrangement = Arrangement.spacedBy(64.dp),
             ) {
+                Text(
+                    text = "음악과 함께 일상의 한 박자를 올려보세요",
+                    color = Gray500,
+                    style = normal16
+                )
                 HomeGroupList(
                     uiState = uiState,
                     onEvent = onEvent
@@ -119,14 +136,13 @@ private fun HomeGroupItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .border(
-                width = 0.5.dp,
-                color = Gray200,
+            .background(
+                color = Gray100,
                 shape = RoundedCornerShape(size = corderRadius)
             )
             .padding(
                 horizontal = 20.dp,
-                vertical = 36.dp
+                vertical = 32.dp
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,

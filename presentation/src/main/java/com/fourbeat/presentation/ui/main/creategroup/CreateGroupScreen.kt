@@ -10,13 +10,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fourbeat.domain.model.group.GroupMemberCount
+import com.fourbeat.presentation.theme.PrimaryColor
 import com.fourbeat.presentation.theme.contentPadding
-import com.fourbeat.presentation.theme.normal32
+import com.fourbeat.presentation.theme.medium32
 import com.fourbeat.presentation.ui.component.FourBeatButton
 import com.fourbeat.presentation.ui.component.FourBeatLabel
 import com.fourbeat.presentation.ui.component.FourBeatSpacer
@@ -67,8 +71,11 @@ private fun CreateGroupScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             Text(
-                text = "어떤 방으로 부를까?",
-                style = normal32,
+                text = buildAnnotatedString {
+                    append("어떤 방으로 부를까")
+                    withStyle(SpanStyle(color = PrimaryColor)) { append("?") }
+                },
+                style = medium32,
             )
             FourBeatTextField(
                 value = uiState.name,

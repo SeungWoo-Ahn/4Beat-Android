@@ -3,7 +3,9 @@ package com.fourbeat.presentation.ui.auth.login
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,16 +13,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fourbeat.presentation.model.auth.OAuthUser
 import com.fourbeat.presentation.theme.Black
 import com.fourbeat.presentation.theme.Gray500
+import com.fourbeat.presentation.theme.PrimaryColor
 import com.fourbeat.presentation.theme.White
 import com.fourbeat.presentation.theme.contentPadding
 import com.fourbeat.presentation.theme.normal16
-import com.fourbeat.presentation.theme.normal56
+import com.fourbeat.presentation.theme.medium56
 import com.fourbeat.presentation.ui.component.FourBeatButton
 import com.fourbeat.presentation.ui.component.FourBeatSpacer
+import com.fourbeat.presentation.ui.component.Logo
 
 @Composable
 fun LoginRoute(
@@ -60,9 +67,19 @@ private fun LoginScreen(
             .padding(all = contentPadding),
         verticalArrangement = Arrangement.Bottom
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Logo(fontSize = 32)
+        }
+        FourBeatSpacer(modifier = Modifier.weight(1f))
         Text(
-            text = "오늘\n뭐 들었어?",
-            style = normal56
+            text = buildAnnotatedString {
+                append("오늘\n뭐 들었어")
+                withStyle(SpanStyle(color = PrimaryColor)) { append("?") }
+            },
+            style = medium56
         )
         FourBeatSpacer(size = 16)
         Text(

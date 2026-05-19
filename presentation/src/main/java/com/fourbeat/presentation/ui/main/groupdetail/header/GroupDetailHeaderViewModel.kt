@@ -10,7 +10,6 @@ import androidx.navigation.toRoute
 import com.fourbeat.domain.model.group.Group
 import com.fourbeat.domain.usecase.group.GetGroupInfoUseCase
 import com.fourbeat.domain.usecase.group.GetGroupPostStatusUseCase
-import com.fourbeat.presentation.mapper.toMessage
 import com.fourbeat.presentation.mapper.toUiModel
 import com.fourbeat.presentation.model.common.MessageCollector
 import com.fourbeat.presentation.model.group.GroupUiModel
@@ -72,9 +71,10 @@ class GroupDetailHeaderViewModel @Inject constructor(
         viewModelScope.launch {
             getGroupPostStatusUseCase(groupId)
                 .onSuccess { status ->
-                    MessageCollector.sendMessage(status.toMessage())
                     if (status.canPost) {
                         _sideEffect.send(GroupDetailHeaderSideEffect.NavigateToSelectSong(groupId))
+                    } else {
+                        MessageCollector.sendMessage("오늘 ${status.totalPostLimit}회의 할당량을 모두 소진했어요")
                     }
                 }
                 .onFailure { }

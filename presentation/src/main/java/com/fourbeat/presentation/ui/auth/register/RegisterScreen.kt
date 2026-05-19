@@ -10,14 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fourbeat.presentation.theme.Gray500
+import com.fourbeat.presentation.theme.PrimaryColor
 import com.fourbeat.presentation.theme.White
 import com.fourbeat.presentation.theme.contentPadding
 import com.fourbeat.presentation.theme.normal16
-import com.fourbeat.presentation.theme.normal32
+import com.fourbeat.presentation.theme.medium32
 import com.fourbeat.presentation.ui.component.FourBeatButton
 import com.fourbeat.presentation.ui.component.FourBeatSpacer
 import com.fourbeat.presentation.ui.component.FourBeatTextField
@@ -69,8 +73,11 @@ private fun RegisterScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "처음이지?",
-                    style = normal32,
+                    text = buildAnnotatedString {
+                        append("처음이지")
+                        withStyle(SpanStyle(color = PrimaryColor)) { append("?") }
+                    },
+                    style = medium32,
                 )
                 Text(
                     text = "어떻게 부르면 좋을지 알려줘.",

@@ -9,6 +9,11 @@ import com.fourbeat.presentation.model.group.FeedPostUiModel
 import com.fourbeat.presentation.model.group.GroupFeedSlotUiModel
 import com.fourbeat.presentation.model.group.GroupFeedUiData
 import com.fourbeat.presentation.model.group.GroupUiModel
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+private val isoFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.KOREA)
+private val timeFormatter = SimpleDateFormat("HH:mm", Locale.KOREA)
 
 fun Group.toUiModel(): GroupUiModel =
     GroupUiModel(
@@ -17,13 +22,6 @@ fun Group.toUiModel(): GroupUiModel =
         code = code,
         capacity = "${memberCount}명/${maxMemberCount}명",
     )
-
-fun MyPostStatus.toMessage(): String =
-    if (canPost) {
-        "오늘 ${totalPostLimit}회 중에 ${remainingPostCount}회 남았어요"
-    } else {
-        "오늘 ${totalPostLimit}회의 할당량을 모두 소진했어요"
-    }
 
 fun MyPostStatus.toAnnounce(): String =
     "· 오늘은 ${remainingPostCount}번 더 올릴 수 있어"
@@ -48,5 +46,8 @@ fun FeedPost.toUiModel(): FeedPostUiModel =
         song = song,
         videoSource = videoSource,
         comment = comment,
-        createdAt = createdAt,
+        createdAt = runCatching {
+            val trimmed = createdAt.substringBefore('.')
+            timeFormatter.format(isoFormatter.parse(trimmed)!!)
+        }.getOrDefault(createdAt),
     )

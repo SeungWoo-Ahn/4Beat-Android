@@ -1,8 +1,10 @@
 package com.fourbeat.presentation.ui.main.groupdetail
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +22,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.exoplayer.ExoPlayer
@@ -152,10 +155,15 @@ private fun GroupDetailDatePage(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(all = 8.dp)
             ) { page ->
                 val group = slotGroups.getOrNull(page) ?: return@HorizontalPager
                 val isGroupActive = isActive && page == pagerState.settledPage
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     group.forEachIndexed { index, slot ->
                         GroupDetailSlotItem(
                             modifier = Modifier
