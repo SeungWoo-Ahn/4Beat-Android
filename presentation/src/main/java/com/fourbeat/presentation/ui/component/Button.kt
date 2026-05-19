@@ -9,12 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.fourbeat.presentation.theme.PrimaryColor
 import com.fourbeat.presentation.theme.White
+import com.fourbeat.presentation.theme.bold18
 import com.fourbeat.presentation.theme.corderRadius
 
 @Composable
@@ -43,10 +41,7 @@ fun FourBeatButton(
     ) {
         Text(
             text = if (isLoading) "로딩중..." else text,
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            style = bold18
         )
     }
 }

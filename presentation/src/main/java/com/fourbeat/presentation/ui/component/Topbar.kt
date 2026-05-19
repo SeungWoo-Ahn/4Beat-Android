@@ -6,11 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,10 +29,7 @@ fun TopbarForBack(
         contentAlignment = Alignment.CenterStart,
     ) {
         IconButton(onClick = onBack) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "ic-back",
-            )
+            BackIcon()
         }
     }
 }
@@ -57,10 +49,7 @@ fun TitleTopBar(
             modifier = Modifier.align(Alignment.CenterStart),
             onClick = onBack,
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "ic-back",
-            )
+            BackIcon()
         }
         Text(
             modifier = Modifier.align(Alignment.Center),
@@ -79,30 +68,24 @@ fun HomeTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(topBarHeight)
+            .height(120.dp)
             .padding(horizontal = contentPadding),
     ) {
         Box(
-            modifier = Modifier.align(Alignment.CenterStart),
+            modifier = Modifier.align(Alignment.BottomStart),
         ) {
-            // TODO: 앱 로고
+            Logo(fontSize = 48)
         }
         Row(
-            modifier = Modifier.align(Alignment.CenterEnd),
+            modifier = Modifier.align(Alignment.BottomEnd),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             IconButton(onClick = onPlusClick) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "ic-plus",
-                )
+                PlusCircleIcon()
             }
             IconButton(onClick = onHashClick) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "ic-search",
-                )
+                AtIcon()
             }
         }
     }

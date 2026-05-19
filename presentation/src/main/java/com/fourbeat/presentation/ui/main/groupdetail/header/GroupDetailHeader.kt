@@ -5,10 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,9 +15,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fourbeat.presentation.theme.Gray500
 import com.fourbeat.presentation.theme.contentPadding
-import com.fourbeat.presentation.theme.normal14
 import com.fourbeat.presentation.theme.medium32
+import com.fourbeat.presentation.theme.normal14
 import com.fourbeat.presentation.ui.component.FourBeatSpacer
+import com.fourbeat.presentation.ui.component.ShareIcon
+import com.fourbeat.presentation.ui.component.UploadIcon
 
 @Composable
 fun GroupDetailHeader(
@@ -65,16 +63,10 @@ fun GroupDetailHeader(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             IconButton(onClick = { viewModel.onEvent(GroupDetailHeaderEvent.OnPlusIconClicked) }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "ic-plus",
-                )
+                UploadIcon()
             }
             IconButton(onClick = { viewModel.onEvent(GroupDetailHeaderEvent.OnHashIconClicked) }) {
-                Icon(
-                    imageVector = Icons.Default.Share,
-                    contentDescription = "ic-share",
-                )
+                ShareIcon()
             }
         }
     }

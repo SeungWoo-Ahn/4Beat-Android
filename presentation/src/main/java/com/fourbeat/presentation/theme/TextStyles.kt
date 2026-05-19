@@ -29,7 +29,6 @@ val logoStyle = TextStyle(
 )
 
 val bold18 = TextStyle(
-    fontFamily = NotoSerifKr,
     fontSize = 18.sp,
     fontWeight = FontWeight.Bold,
 )
@@ -61,7 +60,6 @@ val normal16 = TextStyle(
     fontWeight = FontWeight.Normal,
 )
 val normal14 = TextStyle(
-    fontFamily = NotoSerifKr,
     fontSize = 14.sp,
     fontWeight = FontWeight.Normal,
 )
