@@ -68,16 +68,16 @@ fun HomeTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .padding(horizontal = contentPadding),
+            .padding(horizontal = contentPadding)
+            .padding(top = 64.dp),
     ) {
         Box(
-            modifier = Modifier.align(Alignment.BottomStart),
+            modifier = Modifier.align(Alignment.CenterStart),
         ) {
             Logo(fontSize = 48)
         }
         Row(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier.align(Alignment.CenterEnd),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {

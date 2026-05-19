@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fourbeat.presentation.theme.Black
 import com.fourbeat.presentation.theme.Gray200
+import com.fourbeat.presentation.theme.PrimaryColor
 import com.fourbeat.presentation.theme.White
 import com.fourbeat.presentation.theme.bold18
 import com.fourbeat.presentation.theme.corderRadius
@@ -25,8 +26,8 @@ fun GroupMemberChip(
     isSelected: Boolean,
     onSelected: () -> Unit,
 ) {
-    val backgroundColor = if (isSelected) Black else White
-    val borderColor = if (isSelected) Black else Gray200
+    val backgroundColor = if (isSelected) PrimaryColor else White
+    val borderColor = if (isSelected) PrimaryColor else Gray200
     val contentColor = if (isSelected) White else Black
     val shape = RoundedCornerShape(size = corderRadius)
 
