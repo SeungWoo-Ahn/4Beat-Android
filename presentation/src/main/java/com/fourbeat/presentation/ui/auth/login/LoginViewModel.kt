@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +41,6 @@ class LoginViewModel @Inject constructor(
             uiState = uiState.copy(isLoading = true)
             runCatching { KakaoClient.loginWithTalk(context) }
                 .onSuccess { oAuthUser ->
-                    Timber.i(oAuthUser.toString())
                     login(oAuthUser)
                 }
                 .onFailure {
