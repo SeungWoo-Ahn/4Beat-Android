@@ -153,7 +153,7 @@ val songPagingFlow: Flow<PagingData<Song>> =
 
 이 방식으로 상위 8개 음악 앱을 대상으로 테스트했습니다.
 
-<!-- 메테데이터 테스트 이미지 -->
+<img width="600" src="https://github.com/user-attachments/assets/cf6493d2-7bca-4492-a33d-50fb88e3a5e9" />
 
 <br>
 
@@ -372,7 +372,7 @@ class SubmitPostUseCase @Inject constructor(
 
 <br>
 
-<!-- 비행기 모드에서 작동하는 증거 사진 -->
+<img width="1000" src="https://github.com/user-attachments/assets/e4a0c396-f755-48da-9fd0-87de84f8630c" />
 
 <br>
 
@@ -386,8 +386,6 @@ class SubmitPostUseCase @Inject constructor(
 피드는 날짜별로 위아래(`VerticalPager`), 그룹 멤버별로 좌우(`HorizontalPager`)로 넘기는 구조입니다. <br>
 한 화면에는 3명의 게시글이 세로로 배치되고, 각 영상은 `REPEAT_MODE_ONE`으로 무한 반복 재생되도록 기획했습니다. <br>
 **항상 3개의 영상이 동시에, 끝없이 재생되는** 화면이다 보니 세 가지 문제가 차례로 드러났습니다.
-
-<!-- 피드 화면 구조 이미지 -->
 
 <br>
 
